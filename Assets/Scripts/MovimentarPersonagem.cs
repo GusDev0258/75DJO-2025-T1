@@ -20,6 +20,7 @@ public class MovimentarPersonagem : MonoBehaviour
     public bool isOnTheGround;
 
     private Vector3 fallingSpeed;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +37,15 @@ public class MovimentarPersonagem : MonoBehaviour
         Vector3 move = transform.right * x + transform.forward * z;
 
         controller.Move(move * speed * Time.deltaTime);
+
+        if (isOnTheGround && Input.GetButtonDown("Jump"))
+        {
+            fallingSpeed.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
+
+        fallingSpeed.y += gravity * Time.deltaTime;
+
+        controller.Move(fallingSpeed * Time.deltaTime);
     }
 
     void OnGizmosSelected()
