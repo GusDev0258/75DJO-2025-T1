@@ -16,7 +16,8 @@ public class CameraRotation : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     // Update is called once per frame
@@ -29,5 +30,6 @@ public class CameraRotation : MonoBehaviour
 
        rotation = Mathf.Clamp(rotation, minAngle, maxAngle);
        transform.localRotation = Quaternion.Euler(rotation, 0f, 0f);
+       transformPlayer.Rotate(Vector3.up * mouseX);
     }
 }

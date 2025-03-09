@@ -46,6 +46,7 @@ public class MovimentarPersonagem : MonoBehaviour
         fallingSpeed.y += gravity * Time.deltaTime;
 
         controller.Move(fallingSpeed * Time.deltaTime);
+
     }
 
     void OnGizmosSelected()
