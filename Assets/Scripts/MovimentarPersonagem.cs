@@ -21,10 +21,19 @@ public class MovimentarPersonagem : MonoBehaviour
 
     private Vector3 fallingSpeed;
 
+    private Transform cameraTransform;
+
+    private bool isCrouched;
+    private bool blockedStand;
+    public float standHeight, crouchHeight, standedCameraPosition, crouchedCameraPosition;
+
+
+
     // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        cameraTransform = Camera.main.transform;
     }
 
     // Update is called once per frame
@@ -38,6 +47,8 @@ public class MovimentarPersonagem : MonoBehaviour
 
         controller.Move(move * speed * Time.deltaTime);
 
+        CheckIfIsCrouchBlocked();
+        
         if (isOnTheGround && Input.GetButtonDown("Jump"))
         {
             fallingSpeed.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
@@ -47,11 +58,41 @@ public class MovimentarPersonagem : MonoBehaviour
 
         controller.Move(fallingSpeed * Time.deltaTime);
 
+        if(Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            CrouchStandup();
+        }
+
     }
 
     void OnGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(groundCheck.position, sphereRadius);
+    }
+
+    private void CrouchStandup()
+    {
+        isCrouched = !isCrouched;
+        if (blockedStand)
+        {
+            return;
+        }
+        if (isCrouched)
+        {
+            controller.height = crouchHeight;
+            cameraTransform.localPosition = new Vector3(0, crouchedCameraPosition, 0);
+        }
+        else
+        {
+            controller.height = standHeight;
+            cameraTransform.localPosition = new Vector3(0, standedCameraPosition, 0);
+        }
+    }
+
+    private void CheckIfIsCrouchBlocked()
+    {
+        RaycastHit hit;
+        blockedStand = Physics.Raycast(transform.position, Vector3.up, out hit, crouchHeight);
     }
 }
