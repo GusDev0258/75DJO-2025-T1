@@ -38,6 +38,7 @@ public class ObjectActions : MonoBehaviour
     private void Take()
     {
         Destroy(identifier.GetTakeObject());
+        identifier.HideText();
     }
 
     private void Drag()

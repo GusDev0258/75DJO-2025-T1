@@ -8,7 +8,7 @@ public class MovimentarPersonagem : MonoBehaviour
 
     public float speed = 6f;
 
-    public float jumpHeight = 6f;
+    public float jumpHeight = 8f;
 
     public float gravity = -20f;
 
@@ -45,13 +45,18 @@ public class MovimentarPersonagem : MonoBehaviour
 
         Vector3 move = transform.right * x + transform.forward * z;
 
-        controller.Move(move * speed * Time.deltaTime);
+        controller.Move(move * (speed * Time.deltaTime));
 
         CheckIfIsCrouchBlocked();
         
         if (isOnTheGround && Input.GetButtonDown("Jump"))
         {
             fallingSpeed.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
+
+        if (!isOnTheGround )
+        {   
+            fallingSpeed.y += gravity  * 2 * Time.deltaTime;
         }
 
         fallingSpeed.y += gravity * Time.deltaTime;
