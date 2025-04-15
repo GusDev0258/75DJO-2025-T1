@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Drag
   - Take
+  - Weapon
+  - TakeDamage
   layers:
   - Default
   - TransparentFX
