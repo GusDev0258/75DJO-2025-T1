@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class PatrulharLimitado : MonoBehaviour
 {
     public Transform[] waypoints;
-    public float waitTime = 2f;
+    public float waitTime = 1f;
 
     private int currentIndex = 0;
     private NavMeshAgent agent;
