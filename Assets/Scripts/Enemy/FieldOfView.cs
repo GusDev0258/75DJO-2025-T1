@@ -38,16 +38,11 @@ public class FieldOfView : MonoBehaviour
                 if (Vector3.Angle(transform.forward, dirToAlvo) < viewAngle / 2)
                 {
                     float disToAlvo = Vector3.Distance(transform.position, alvo.transform.position);
-                    Vector3 origin = transform.position + Vector3.up * 0.5f;
-                    RaycastHit hit;
-                    if (Physics.Raycast(origin, dirToAlvo, out hit, disToAlvo))
+                    if (!Physics.Raycast(transform.position, dirToAlvo, disToAlvo))
                     {
-                        if (hit.collider.gameObject == player)
-                        {
-                            canSeePlayer = true;
-                            LookToPlayer();
-                            return;
-                        }
+                        canSeePlayer = true;
+                        LookToPlayer();
+                        return;
                     }
                 }
             }

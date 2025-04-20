@@ -10,7 +10,6 @@ public class Patrulhar : MonoBehaviour
     private NavMeshAgent agent;
     public float range;
     private float tempo;
-    private bool isSearching = false;
 
     void Start()
     {
