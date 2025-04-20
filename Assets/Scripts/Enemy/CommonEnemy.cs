@@ -20,6 +20,12 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
     public AudioClip deadSound;
 
     public AudioClip stepSound;
+
+    private FieldOfView fov;
+    private Patrulhar patrulhar;
+
+    private PontuacaoJogador pontuacaoManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,51 +33,70 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
         player = GameObject.FindWithTag("Player");
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
+        pontuacaoManager = FindObjectOfType<PontuacaoJogador>();
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
+
         audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 0.5f;
         audioSource.reverbZoneMix = 1.1f;
+        audioSource.spatialBlend = 1.0f;
+        audioSource.minDistance = 1f;
+        audioSource.maxDistance = 20f;
+        audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
+        fov = GetComponent<FieldOfView>();
+        patrulhar = GetComponent<Patrulhar>();
     }
 
     // Update is called once per frame
     void Update()
     {
-       HuntPlayer(); 
-       LookToPlayer();
-       if (life <= 0)
-       {
-           this.ToDie();
-       }
+        if (life <= 0)
+        {
+            ToDie();
+            return;
+        }
+
+        if (fov.canSeePlayer)
+        {
+            LookToPlayer();
+            HuntPlayer();
+        }
+        else
+        {
+            animator.SetBool("stopAttack", true);
+            animator.ResetTrigger("tookShot");
+            FixRigidExit();
+            agent.isStopped = false;
+            patrulhar.Andar();
+        }
     }
 
     private void HuntPlayer()
     {
-       float distanceFromPlayer = Vector3.Distance(transform.position, player.transform.position);
-       if (distanceFromPlayer < attackDistance)
-       {
-           agent.isStopped = true;
-           print("Ataquei");
-           animator.SetTrigger("attack");
-           animator.SetBool("canWalk", false);
-           animator.SetBool("stopAttack", false);
-           FixRigidEnter();
-       }
+        float distanceFromPlayer = Vector3.Distance(transform.position, player.transform.position);
+        if (distanceFromPlayer < attackDistance)
+        {
+            agent.isStopped = true;
+            animator.SetTrigger("attack");
+            animator.SetBool("canWalk", false);
+            animator.SetBool("stopAttack", false);
+            FixRigidEnter();
+        }
 
-       if (distanceFromPlayer >= attackDistance + 1)
-       {
-           animator.SetBool("stopAttack", true);
-           FixRigidExit();
-       }
+        if (distanceFromPlayer >= attackDistance + 1)
+        {
+            animator.SetBool("stopAttack", true);
+            FixRigidExit();
+        }
 
-       if (animator.GetBool("canWalk"))
-       {
-           agent.isStopped = false;
-           agent.SetDestination(player.transform.position);
-           animator.ResetTrigger("attack");
-       }
+        if (animator.GetBool("canWalk"))
+        {
+            agent.isStopped = false;
+            agent.SetDestination(player.transform.position);
+            animator.ResetTrigger("attack");
+        }
     }
 
     private void LookToPlayer()
@@ -95,8 +120,23 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
     {
         life -= damage;
         agent.isStopped = true;
-        animator.SetTrigger("tookShot");
-        animator.SetBool("canWalk", false);
+        if (life >= 0)
+        {
+            animator.SetTrigger("tookShot");
+            animator.SetBool("canWalk", false);
+        }
+
+        StartCoroutine(VoltarAndarDepoisDeTomarDano());
+    }
+
+    private IEnumerator VoltarAndarDepoisDeTomarDano()
+    {
+        yield return new WaitForSeconds(0.5f);
+        if (life > 0)
+        {
+            animator.SetBool("canWalk", true);
+            agent.isStopped = false;
+        }
     }
 
     public void DoDamage()
@@ -109,18 +149,19 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
         audioSource.clip = deadSound;
         audioSource.Play();
 
+        pontuacaoManager.AdicionarInimigosMortos();
+        pontuacaoManager.AdicionarPontuacao(10);
         agent.isStopped = true;
         animator.SetBool("canWalk", false);
         animator.SetBool("stopAttack", true);
-        
         animator.SetBool("dead", true);
 
         this.enabled = false;
+
     }
 
     public void Step()
     {
         audioSource.PlayOneShot(stepSound, 0.3f);
     }
-    
 }

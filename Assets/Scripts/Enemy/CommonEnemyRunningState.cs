@@ -8,6 +8,7 @@ public class CommonEnemyRunningState : StateMachineBehaviour
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.SetBool("canWalk", true);    
+        animator.ResetTrigger("tookDamage");
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

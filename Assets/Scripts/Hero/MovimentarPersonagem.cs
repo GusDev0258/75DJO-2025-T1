@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class MovimentarPersonagem : MonoBehaviour
 {
@@ -36,7 +37,6 @@ public class MovimentarPersonagem : MonoBehaviour
     private int life = 100;
     public Slider lifeSlider;
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -52,6 +52,12 @@ public class MovimentarPersonagem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (life <= 0)
+        {
+            FimDeJogo();
+            return;
+        }
+        
         isOnTheGround = Physics.CheckSphere(groundCheck.position, sphereRadius, groundMask);
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
@@ -135,5 +141,15 @@ public class MovimentarPersonagem : MonoBehaviour
     {
         RaycastHit hit;
         blockedStand = Physics.Raycast(transform.position, Vector3.up, out hit, crouchHeight);
+    }
+
+    private void FimDeJogo()
+    {
+        // Time.timeScale = 0;
+        // Camera.main.GetComponent<AudioListener>().enabled = false;
+        // GetComponentInChildren<Glock>().enabled = false;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        SceneManager.LoadScene(0);
     }
 }
