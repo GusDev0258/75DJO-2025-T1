@@ -22,7 +22,7 @@ public class Patrulhar : MonoBehaviour
         Vector3 randomPoint = center + Random.insideUnitSphere * range;
         NavMeshHit hit;
 
-        if (NavMesh.SamplePosition(randomPoint, out hit, 2.0f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(randomPoint, out hit, 5.0f, NavMesh.AllAreas))
         {
             result = hit.position;
             return true;
@@ -34,18 +34,16 @@ public class Patrulhar : MonoBehaviour
 
     public void Andar()
     {
-        if (agent.remainingDistance <= agent.stoppingDistance || tempo >= 6.0f)
+        tempo += Time.deltaTime;
+        if (agent.remainingDistance <= agent.stoppingDistance || tempo >= 1.0f)
         {
             Vector3 point;
             if (RandomPoint(transform.position, range, out point))
             {
                 agent.SetDestination(point);
-                tempo = 0;
             }
-            else
-            {
-                tempo += Time.deltaTime;
-            }
+
+            tempo = 0;
 
             Debug.DrawLine(transform.position, agent.destination, Color.magenta);
         }

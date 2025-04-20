@@ -84,18 +84,12 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
             animator.SetBool("stopAttack", false);
             FixRigidEnter();
         }
-
-        if (distanceFromPlayer >= attackDistance + 1)
-        {
-            animator.SetBool("stopAttack", true);
-            FixRigidExit();
-        }
-
-        if (animator.GetBool("canWalk"))
+        else
         {
             agent.isStopped = false;
             agent.SetDestination(player.transform.position);
-            animator.ResetTrigger("attack");
+            animator.SetBool("canWalk", true);
+            animator.SetBool("stopAttack", true);
         }
     }
 

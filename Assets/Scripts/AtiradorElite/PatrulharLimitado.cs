@@ -35,7 +35,6 @@ public class PatrulharLimitado : MonoBehaviour
     {
         esperando = true;
 
-        // Pode colocar animação de idle/observando aqui se quiser
         yield return new WaitForSeconds(waitTime);
 
         currentIndex = (currentIndex + 1) % waypoints.Length;

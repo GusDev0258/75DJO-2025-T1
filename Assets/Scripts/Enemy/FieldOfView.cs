@@ -6,9 +6,9 @@ public class FieldOfView : MonoBehaviour
     public float viewDistance = 10f;
     [Range(0, 360)] public float viewAngle = 35f;
     public bool canSeePlayer;
-    
+
     private GameObject player;
-    
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -38,11 +38,16 @@ public class FieldOfView : MonoBehaviour
                 if (Vector3.Angle(transform.forward, dirToAlvo) < viewAngle / 2)
                 {
                     float disToAlvo = Vector3.Distance(transform.position, alvo.transform.position);
-                    if (!Physics.Raycast(transform.position, dirToAlvo, disToAlvo))
+                    Vector3 origin = transform.position + Vector3.up * 0.5f;
+                    RaycastHit hit;
+                    if (Physics.Raycast(origin, dirToAlvo, out hit, disToAlvo))
                     {
-                        canSeePlayer = true;
-                        LookToPlayer();
-                        return;
+                        if (hit.collider.gameObject == player)
+                        {
+                            canSeePlayer = true;
+                            LookToPlayer();
+                            return;
+                        }
                     }
                 }
             }
@@ -50,23 +55,23 @@ public class FieldOfView : MonoBehaviour
 
         canSeePlayer = false;
     }
-    
-    // private void OnDrawGizmosSelected()
-    // {
-    //     Gizmos.color = Color.yellow;
-    //     Gizmos.DrawWireSphere(transform.position, viewDistance);
-    //     
-    //     Vector3 viewAngleA = DirectionFromAngle(-viewAngle / 2);
-    //     Vector3 viewAngleB = DirectionFromAngle(viewAngle / 2);
-    //     
-    //     Gizmos.color = Color.red;
-    //     Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewDistance);
-    //     Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewDistance);
-    // }
-    
-    // private Vector3 DirectionFromAngle(float eulerY, float anguloEmGraus)
-    // {
-    //     anguloEmGraus += eulerY;
-    //     return new Vector3(Mathf.Sin(anguloEmGraus * Mathf.Deg2Rad), 0, Mathf.Cos(anguloEmGraus * Mathf.Deg2Rad));
-    // }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, viewDistance);
+
+        Vector3 viewAngleA = DirectionFromAngle(this.transform.eulerAngles.y, -this.viewAngle / 2);
+        Vector3 viewAngleB = DirectionFromAngle(this.transform.eulerAngles.y, this.viewAngle / 2);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewDistance);
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewDistance);
+    }
+
+    private Vector3 DirectionFromAngle(float eulerY, float anguloEmGraus)
+    {
+        anguloEmGraus += eulerY;
+        return new Vector3(Mathf.Sin(anguloEmGraus * Mathf.Deg2Rad), 0, Mathf.Cos(anguloEmGraus * Mathf.Deg2Rad));
+    }
 }

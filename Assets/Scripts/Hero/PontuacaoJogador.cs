@@ -14,11 +14,22 @@ public class PontuacaoJogador : MonoBehaviour
     public Door portaBoss;
     public Door portaFora;
 
+    private AudioSource source;
+
+    public AudioClip openBossDoorSound;
+
+    public AudioClip openOutsideDoorSound;
+
     // Start is called before the first frame update
     void Start()
     {
         pontuacaoJogador = 0;
         inimigosMortos = 0;
+        source = GetComponent<AudioSource>();
+        if (source == null)
+        {
+            source = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     // Update is called once per frame
@@ -46,6 +57,13 @@ public class PontuacaoJogador : MonoBehaviour
         if (portaBoss.IsLocked)
         {
             portaBoss.IsLocked = false;
+            portaBoss.GetComponent<Outline>().OutlineWidth = 5f;
+            if (!portaBoss.DoorClosed)
+            {
+                portaBoss.GetComponent<Outline>().OutlineWidth = 0f;
+            }
+            source.clip = openBossDoorSound;
+            source.Play();
         }
     }
 
@@ -54,6 +72,13 @@ public class PontuacaoJogador : MonoBehaviour
         if (portaFora.IsLocked)
         {
             portaFora.IsLocked = false;
+            portaFora.GetComponent<Outline>().OutlineWidth = 5f;
+            if (!portaFora.DoorClosed)
+            {
+                portaFora.GetComponent<Outline>().OutlineWidth = 0f;
+            }
+            source.clip = openOutsideDoorSound;
+            source.Play();
         }
     }
 }

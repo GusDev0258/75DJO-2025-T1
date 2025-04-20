@@ -24,7 +24,8 @@ public class BossScript : MonoBehaviour, ILevarDano
     public AudioClip stepSound;
 
     private FieldOfView fov;
-    private Patrulhar patrulhar;
+
+    private PatrulharLimitado patrulharLimitado;
     private PontuacaoJogador pontuacaoManager;
 
     // Start is called before the first frame update
@@ -48,7 +49,7 @@ public class BossScript : MonoBehaviour, ILevarDano
         audioSource.maxDistance = 20f;
         audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         fov = GetComponent<FieldOfView>();
-        patrulhar = GetComponent<Patrulhar>();
+        patrulharLimitado = GetComponent<PatrulharLimitado>();
     }
 
     // Update is called once per frame
@@ -64,6 +65,11 @@ public class BossScript : MonoBehaviour, ILevarDano
 
         if (fov.canSeePlayer)
         {
+            if (patrulharLimitado != null && patrulharLimitado.enabled)
+            {
+                patrulharLimitado.enabled = false;
+            }
+
             LookToPlayer();
             GrunirToPlayer();
             HuntPlayer();
@@ -79,7 +85,10 @@ public class BossScript : MonoBehaviour, ILevarDano
         {
             animator.SetBool("pararAtaque", true);
             agent.isStopped = false;
-            patrulhar.Andar();
+            if (patrulharLimitado != null && patrulharLimitado.enabled)
+            {
+                patrulharLimitado.enabled = true;
+            }
         }
     }
 
