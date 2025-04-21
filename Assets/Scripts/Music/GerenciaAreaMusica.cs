@@ -34,7 +34,7 @@ public class GerenciaAreaMusica : MonoBehaviour
     {
         if (audioSource.clip == novaMusica) return;
 
-        audioSource.Stop(); // garante que a música anterior pare
+        audioSource.Stop(); 
         audioSource.clip = novaMusica;
         audioSource.Play();
     }

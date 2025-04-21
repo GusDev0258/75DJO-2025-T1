@@ -67,7 +67,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
                 estahPatrulhando = false;
                 patrulhar.enabled = false;
             }
-            
+
             LookToPlayer();
             HuntPlayer();
         }
@@ -79,7 +79,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
             patrulhar.Andar();
             animator.SetBool("canWalk", true);
             animator.SetBool("stopAttack", true);
-            animator.ResetTrigger("tookShot");
+            // animator.ResetTrigger("tookShot");
             FixRigidExit();
         }
     }
@@ -125,25 +125,26 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
 
     public void TakeDamage(int damage)
     {
-        if (life > 0)
+        if (life > 0 && !animator.GetBool("morreu"))
         {
             life -= damage;
             agent.isStopped = true;
             animator.SetTrigger("tookShot");
             animator.SetBool("canWalk", false);
             animator.SetBool("stopAttack", true);
+            StartCoroutine(VoltarAndarDepoisDeTomarDano());
         }
-
-        StartCoroutine(VoltarAndarDepoisDeTomarDano());
     }
 
     private IEnumerator VoltarAndarDepoisDeTomarDano()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
         if (life > 0)
         {
-            animator.SetBool("canWalk", true);
             agent.isStopped = false;
+            patrulhar.enabled = true;
+            animator.SetBool("canWalk", true);
+            animator.SetBool("stopAttack", false);
         }
     }
 
@@ -154,6 +155,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
             estahPatrulhando = false;
             patrulhar.enabled = false;
         }
+
         player.GetComponent<MovimentarPersonagem>().UpdateLife(-10);
         patrulhar.enabled = true;
     }
@@ -172,7 +174,6 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
         animator.SetTrigger("morreu");
 
         this.enabled = false;
-
     }
 
     public void Step()

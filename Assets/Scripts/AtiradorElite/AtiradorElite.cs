@@ -15,15 +15,20 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
 
     public int life = 200;
 
-    public float attackDistance = 5f;
+    public float attackDistance = 6f;
 
     public LineRenderer laser;
-    private float laserDistance = 30f;
+    private float laserDistance = 40f;
 
     private float tempoDeMira;
 
-    private float acuracia = 0.3f;
+    private float acuracia = 0.2f;
+    private float chanceAtirar = 0.2f;
     private Coroutine rotinaDeAtaque;
+    private Coroutine rotinaObservacao;
+
+    public AudioClip somTiro;
+    private AudioSource audioSource;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +45,12 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
             laser = gameObject.AddComponent<LineRenderer>();
         }
 
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         agent = GetComponent<NavMeshAgent>();
         laser.enabled = false;
         player = GameObject.FindWithTag("Player");
@@ -51,18 +62,28 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
     {
         if (fov.canSeePlayer)
         {
+            if (rotinaObservacao == null)
+            {
+                rotinaObservacao = StartCoroutine(ObservarESortearAtaque());
+            }
+
             if (!animator.GetBool("estahEscondido"))
             {
                 Esconder();
             }
-
-            if (Random.value <= 0.2f && rotinaDeAtaque == null)
+            else
             {
-                LevantaAtira();
+                AtualizaPosicaoLaser();
             }
         }
         else
         {
+            if (rotinaObservacao != null)
+            {
+                StopCoroutine(rotinaObservacao);
+                rotinaObservacao = null;
+            }
+
             agent.isStopped = false;
             animator.SetBool("estahEscondido", false);
             animator.SetBool("patrulhando", true);
@@ -72,14 +93,45 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
         }
     }
 
+    private IEnumerator ObservarESortearAtaque()
+    {
+        while (fov.canSeePlayer)
+        {
+            yield return new WaitForSeconds(1f);
+
+            if (animator.GetBool("estahEscondido") && rotinaDeAtaque == null)
+            {
+                if (Random.value <= chanceAtirar)
+                {
+                    animator.SetBool("estahEscondido", false);
+                    animator.SetTrigger("atirar");
+                    animator.SetBool("patrulhando", false);
+                    LevantaAtira();
+                }
+            }
+        }
+
+        rotinaObservacao = null;
+    }
+
+    public void PlaySomTiro()
+    {
+        audioSource.PlayOneShot(somTiro);
+    }
+
     private void Esconder()
     {
         agent.isStopped = true;
         animator.SetBool("estahEscondido", true);
         animator.SetBool("patrulhando", false);
         animator.SetTrigger("esconder");
+    }
 
-        laser.enabled = true;
+    private void AtualizaPosicaoLaser()
+    {
+        if (!laser.enabled)
+            laser.enabled = true;
+
         Vector3 dir = (player.transform.position - transform.position).normalized;
 
         laser.SetPosition(0, transform.position);
@@ -97,7 +149,6 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
 
     private void LevantaAtira()
     {
-        animator.SetBool("estahEscondido", false);
         if (Random.value <= acuracia)
         {
             Vector3 dir = (player.transform.position - transform.position).normalized;
@@ -120,9 +171,8 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
 
     private IEnumerator RealizarAtaque(Vector3 pontoImpacto)
     {
-        yield return new WaitForSeconds(1f); 
-
         animator.SetTrigger("atirar");
+        yield return new WaitForSeconds(0.5f);
 
         if (Vector3.Distance(player.transform.position, pontoImpacto) <= 2f)
         {
@@ -170,9 +220,9 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
         }
         else
         {
-           animator.SetTrigger("morreu");
-           agent.isStopped = true;
-           this.enabled = false;
+            animator.SetTrigger("morreu");
+            agent.isStopped = true;
+            this.enabled = false;
         }
     }
 }
