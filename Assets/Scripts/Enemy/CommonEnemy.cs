@@ -23,6 +23,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
 
     private FieldOfView fov;
     private Patrulhar patrulhar;
+    private bool estahPatrulhando;
 
     private PontuacaoJogador pontuacaoManager;
 
@@ -47,6 +48,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
         audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         fov = GetComponent<FieldOfView>();
         patrulhar = GetComponent<Patrulhar>();
+        estahPatrulhando = true;
     }
 
     // Update is called once per frame
@@ -60,16 +62,25 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
 
         if (fov.canSeePlayer)
         {
-            // LookToPlayer();
+            if (estahPatrulhando)
+            {
+                estahPatrulhando = false;
+                patrulhar.enabled = false;
+            }
+            
+            LookToPlayer();
             HuntPlayer();
         }
         else
         {
+            patrulhar.enabled = true;
+            estahPatrulhando = true;
+            agent.isStopped = false;
+            patrulhar.Andar();
+            animator.SetBool("canWalk", true);
             animator.SetBool("stopAttack", true);
             animator.ResetTrigger("tookShot");
             FixRigidExit();
-            agent.isStopped = false;
-            patrulhar.Andar();
         }
     }
 
@@ -79,6 +90,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
         if (distanceFromPlayer < attackDistance)
         {
             agent.isStopped = true;
+            agent.SetDestination(player.transform.position);
             animator.SetTrigger("attack");
             animator.SetBool("canWalk", false);
             animator.SetBool("stopAttack", false);
@@ -90,6 +102,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
             agent.SetDestination(player.transform.position);
             animator.SetBool("canWalk", true);
             animator.SetBool("stopAttack", true);
+            FixRigidExit();
         }
     }
 
@@ -136,7 +149,13 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
 
     public void DoDamage()
     {
+        if (patrulhar.enabled)
+        {
+            estahPatrulhando = false;
+            patrulhar.enabled = false;
+        }
         player.GetComponent<MovimentarPersonagem>().UpdateLife(-10);
+        patrulhar.enabled = true;
     }
 
     private void ToDie()
