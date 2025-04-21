@@ -187,6 +187,6 @@ public class BossScript : MonoBehaviour, ILevarDano
 
     public void Step()
     {
-        audioSource.PlayOneShot(stepSound, 0.3f);
+        audioSource.PlayOneShot(stepSound, 0.8f);
     }
 }

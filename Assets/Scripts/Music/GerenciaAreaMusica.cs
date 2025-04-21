@@ -10,7 +10,6 @@ public class GerenciaAreaMusica : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -26,6 +25,7 @@ public class GerenciaAreaMusica : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
         }
 
+        audioSource.volume = 0.6f;
         audioSource.loop = true;
         audioSource.playOnAwake = false;
     }
