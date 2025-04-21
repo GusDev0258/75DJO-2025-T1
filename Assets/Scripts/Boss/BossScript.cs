@@ -25,7 +25,7 @@ public class BossScript : MonoBehaviour, ILevarDano
 
     private FieldOfView fov;
 
-    // private PatrulharLimitado patrulharLimitado;
+    private PatrulharLimitado patrulharLimitado;
     private PontuacaoJogador pontuacaoManager;
 
     // Start is called before the first frame update
@@ -42,10 +42,8 @@ public class BossScript : MonoBehaviour, ILevarDano
             audioSource = gameObject.AddComponent<AudioSource>();
         }
 
-        audioSource.playOnAwake = false;
         fov = GetComponent<FieldOfView>();
-        agent.isStopped = true;
-        // patrulharLimitado = GetComponent<PatrulharLimitado>();
+        patrulharLimitado = GetComponent<PatrulharLimitado>();
     }
 
     // Update is called once per frame
@@ -61,12 +59,14 @@ public class BossScript : MonoBehaviour, ILevarDano
         {
             if (!viuPlayerPrimeiraVez)
             {
-                GrunirToPlayer();
+                animator.SetTrigger("gruhnirTrigger");
+                viuPlayerPrimeiraVez = true;
             }
-            else
+
+            LookToPlayer();
+            HuntPlayer();
+            if (!audioSource.isPlaying)
             {
-                LookToPlayer();
-                HuntPlayer();
                 audioSource.clip = screamSound;
                 audioSource.Play();
             }
@@ -78,8 +78,10 @@ public class BossScript : MonoBehaviour, ILevarDano
         float distanceFromPlayer = Vector3.Distance(transform.position, player.transform.position);
         if (distanceFromPlayer < atacarDistance)
         {
+            print("to caçando");
             agent.SetDestination(player.transform.position);
-            // patrulharLimitado.enabled = false;
+            patrulharLimitado.enabled = false;
+            agent.isStopped = true;
             animator.SetTrigger("atacar");
             animator.SetBool("podeAndar", false);
             animator.SetBool("pararAtaque", false);
@@ -95,7 +97,7 @@ public class BossScript : MonoBehaviour, ILevarDano
         if (distanceFromPlayer >= atacarDistance + 1)
         {
             animator.SetBool("pararAtaque", true);
-            // patrulharLimitado.enabled = true;
+            patrulharLimitado.enabled = true;
         }
     }
 
@@ -125,25 +127,18 @@ public class BossScript : MonoBehaviour, ILevarDano
 
     private void GrunirToPlayer()
     {
-        agent.isStopped = true;
-        // patrulharLimitado.enabled = false;
-        animator.SetTrigger("gruhnirTrigger");
-        audioSource.spatialBlend = 0.5f;
-        audioSource.volume = 1.0f;
+        animator.SetBool("gruhnir", true);
+        animator.SetBool("podeAndar", false);
         audioSource.PlayOneShot(screamSound);
         StartCoroutine(VoltarDepoisDeGrunir());
-        viuPlayerPrimeiraVez = true;
     }
 
     private IEnumerator VoltarDepoisDeGrunir()
     {
-        yield return new WaitForSeconds(0.3f);
-        agent.isStopped = false;
-        // patrulharLimitado.enabled = true;
+        animator.ResetTrigger("tookDamage");
         animator.SetBool("gruhnir", false);
         animator.SetBool("podeAndar", true);
-        audioSource.spatialBlend = 1f;
-        animator.ResetTrigger("tookDamage");
+        yield return new WaitForSeconds(0.5f);
     }
 
     private void LookToPlayer()
@@ -183,6 +178,6 @@ public class BossScript : MonoBehaviour, ILevarDano
 
     public void Step()
     {
-        audioSource.PlayOneShot(stepSound, 1.0f);
+        audioSource.PlayOneShot(stepSound, 0.8f);
     }
 }
