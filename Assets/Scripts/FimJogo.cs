@@ -21,6 +21,6 @@ public class FimJogo : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(2);
     }
 }
