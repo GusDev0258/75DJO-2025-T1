@@ -18,7 +18,7 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
     public float attackDistance = 5f;
 
     public LineRenderer laser;
-    private float laserDistance = 50f;
+    private float laserDistance = 30f;
 
     private float tempoDeMira;
 
@@ -53,19 +53,16 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
         {
             if (!animator.GetBool("estahEscondido"))
             {
-                print("entrou aqui");
                 Esconder();
             }
 
             if (Random.value <= 0.2f && rotinaDeAtaque == null)
             {
-                print("rotina de ataque?");
                 LevantaAtira();
             }
         }
         else
         {
-            print("volta a caminhar doidao");
             agent.isStopped = false;
             animator.SetBool("estahEscondido", false);
             animator.SetBool("patrulhando", true);
@@ -74,14 +71,6 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
             animator.SetTrigger("patrulhar");
         }
     }
-    //
-    // private void FixedUpdate()
-    // {
-    //     if (fov.canSeePlayer)
-    //     {
-    //         Mirar();
-    //     }
-    // }
 
     private void Esconder()
     {
@@ -161,27 +150,6 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
         Gizmos.DrawWireSphere(transform.position, attackDistance);
     }
 
-    // private void Atirar()
-    // {
-    //     laser.enabled = false;
-    //     animator.SetBool("estahMirando", false);
-    //     animator.SetBool("patrulhando", false);
-    //     animator.SetTrigger("atirar");
-    //     tempoDeMira = 0f;
-    //     StartCoroutine(DepoisDeAtirar());
-    // }
-    //
-    // private IEnumerator DepoisDeAtirar()
-    // {
-    //     yield return new WaitForSeconds(0.5f);
-    //
-    //     if (Random.value <= acuracia)
-    //     {
-    //         player.GetComponent<MovimentarPersonagem>().UpdateLife(-80);
-    //         animator.ResetTrigger("atirar");
-    //         animator.SetBool("patrulhando", true);
-    //     }
-    // }
     public void TakeDamage(int damage)
     {
         life -= damage;

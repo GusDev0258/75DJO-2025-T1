@@ -22,6 +22,5 @@ namespace Weapons
             Glock glock = GameObject.FindWithTag("Weapon").GetComponent<Glock>();
             glock.addMagazine();
         }
-
     }
 }
