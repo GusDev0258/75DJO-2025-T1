@@ -20,6 +20,7 @@ public class TookDamageState : StateMachineBehaviour
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.SetBool("canWalk", true);    
+        animator.SetBool("stopAttack", false);
         animator.ResetTrigger("tookShot");
     }
 

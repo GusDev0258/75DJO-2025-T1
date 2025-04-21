@@ -57,19 +57,13 @@ public class BossScript : MonoBehaviour, ILevarDano
     {
         if (life <= 0)
         {
-            pontuacaoManager.AdicionarInimigosMortos();
-            pontuacaoManager.AdicionarPontuacao(30);
             pontuacaoManager.DestravarPortaFora();
             ToDie();
         }
 
         if (fov.canSeePlayer)
         {
-            if (patrulharLimitado != null && patrulharLimitado.enabled)
-            {
-                patrulharLimitado.enabled = false;
-            }
-
+            print("to vendo ele");
             LookToPlayer();
             GrunirToPlayer();
             HuntPlayer();
@@ -77,17 +71,6 @@ public class BossScript : MonoBehaviour, ILevarDano
             {
                 audioSource.clip = screamSound;
                 audioSource.Play();
-            }
-
-            animator.ResetTrigger("tookDamage");
-        }
-        else
-        {
-            animator.SetBool("pararAtaque", true);
-            agent.isStopped = false;
-            if (patrulharLimitado != null && patrulharLimitado.enabled)
-            {
-                patrulharLimitado.enabled = true;
             }
         }
     }
@@ -97,22 +80,26 @@ public class BossScript : MonoBehaviour, ILevarDano
         float distanceFromPlayer = Vector3.Distance(transform.position, player.transform.position);
         if (distanceFromPlayer < atacarDistance)
         {
+            print("to caçando");
+            agent.SetDestination(player.transform.position);
+            patrulharLimitado.enabled = false;
             agent.isStopped = true;
             animator.SetTrigger("atacar");
             animator.SetBool("podeAndar", false);
             animator.SetBool("pararAtaque", false);
         }
+        else
+        {
+            animator.SetBool("podeAndar", true);
+            animator.SetBool("pararAtaque", true);
+            agent.SetDestination(player.transform.position);
+            agent.isStopped = false;
+        }
 
         if (distanceFromPlayer >= atacarDistance + 1)
         {
             animator.SetBool("pararAtaque", true);
-        }
-
-        if (animator.GetBool("podeAndar"))
-        {
-            agent.isStopped = false;
-            agent.SetDestination(player.transform.position);
-            animator.ResetTrigger("atacar");
+            patrulharLimitado.enabled = true;
         }
     }
 
@@ -145,11 +132,10 @@ public class BossScript : MonoBehaviour, ILevarDano
         if (!viuPlayerPrimeiraVez)
         {
             agent.isStopped = true;
+            animator.SetBool("gruhnir", true);
             audioSource.spatialBlend = 0f;
             audioSource.volume = 1f;
             audioSource.PlayOneShot(screamSound);
-            animator.SetBool("podeAndar", false);
-            animator.SetBool("grunir", true);
             StartCoroutine(VoltarDepoisDeGrunir());
             viuPlayerPrimeiraVez = true;
         }
@@ -157,12 +143,11 @@ public class BossScript : MonoBehaviour, ILevarDano
 
     private IEnumerator VoltarDepoisDeGrunir()
     {
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(0.5f);
+        agent.isStopped = false;
+        animator.SetBool("gruhnir", false);
         audioSource.spatialBlend = 1f;
         animator.ResetTrigger("tookDamage");
-        animator.SetBool("grunir", false);
-        animator.SetBool("podeAndar", true);
-        agent.isStopped = false;
     }
 
     private void LookToPlayer()
@@ -190,8 +175,14 @@ public class BossScript : MonoBehaviour, ILevarDano
 
     private IEnumerator DisableAfterDeath()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
         this.enabled = false;
+    }
+
+    public void AdicionarPontuacaoEMorrer()
+    {
+        pontuacaoManager.AdicionarInimigosMortos();
+        pontuacaoManager.AdicionarPontuacao(30);
     }
 
     public void Step()

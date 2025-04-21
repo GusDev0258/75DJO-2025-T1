@@ -60,7 +60,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
 
         if (fov.canSeePlayer)
         {
-            LookToPlayer();
+            // LookToPlayer();
             HuntPlayer();
         }
         else
@@ -118,6 +118,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
         {
             animator.SetTrigger("tookShot");
             animator.SetBool("canWalk", false);
+            animator.SetBool("stopAttack", true);
         }
 
         StartCoroutine(VoltarAndarDepoisDeTomarDano());
@@ -149,6 +150,7 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
         animator.SetBool("canWalk", false);
         animator.SetBool("stopAttack", true);
         animator.SetBool("dead", true);
+        animator.SetTrigger("morreu");
 
         this.enabled = false;
 

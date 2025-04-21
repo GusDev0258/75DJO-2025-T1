@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
+using Vector3 = UnityEngine.Vector3;
 
 public class Patrulhar : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class Patrulhar : MonoBehaviour
         Vector3 randomPoint = center + Random.insideUnitSphere * range;
         NavMeshHit hit;
 
-        if (NavMesh.SamplePosition(randomPoint, out hit, 5.0f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
         {
             result = hit.position;
             return true;
@@ -33,18 +34,20 @@ public class Patrulhar : MonoBehaviour
 
     public void Andar()
     {
-        tempo += Time.deltaTime;
-        if (agent.remainingDistance <= agent.stoppingDistance || tempo >= 1.0f)
+        if (agent.remainingDistance <= agent.stoppingDistance || (tempo >= 0.8f))
         {
             Vector3 point;
             if (RandomPoint(transform.position, range, out point))
             {
                 agent.SetDestination(point);
+                tempo = 0;
             }
 
-            tempo = 0;
-
             Debug.DrawLine(transform.position, agent.destination, Color.magenta);
+        }
+        else
+        {
+            tempo += Time.deltaTime;
         }
     }
 }

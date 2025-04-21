@@ -6,11 +6,14 @@ using UnityEngine.AI;
 public class PatrulharLimitado : MonoBehaviour
 {
     public Transform[] waypoints;
-    public float waitTime = 1f;
+    public float waitTime;
 
-    private int currentIndex = 0;
+    [HideInInspector]
+    public int currentIndex = 0;
     private NavMeshAgent agent;
+
     private bool esperando = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,21 +27,29 @@ public class PatrulharLimitado : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        if (agent.remainingDistance <= agent.stoppingDistance && !esperando)
+        if (!enabled) return;
+        if (!esperando && !agent.pathPending)
         {
-            StartCoroutine(EsperarENext());
+            if (agent.remainingDistance <= agent.stoppingDistance)
+            {
+                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                {
+                    StartCoroutine(EsperarENext());
+                }
+            }
         }
     }
 
-    IEnumerator EsperarENext()
+    private IEnumerator EsperarENext()
     {
         esperando = true;
+        agent.isStopped = true;
 
-        yield return new WaitForSeconds(waitTime);
+        yield return new WaitForSeconds(0.2f);
 
         currentIndex = (currentIndex + 1) % waypoints.Length;
         agent.SetDestination(waypoints[currentIndex].position);
         esperando = false;
+        agent.isStopped = false;
     }
 }
