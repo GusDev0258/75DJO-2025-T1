@@ -150,6 +150,6 @@ public class MovimentarPersonagem : MonoBehaviour
         // GetComponentInChildren<Glock>().enabled = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(2);
     }
 }

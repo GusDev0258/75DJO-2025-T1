@@ -112,10 +112,10 @@ public class CommonEnemy : MonoBehaviour, ILevarDano
 
     public void TakeDamage(int damage)
     {
-        life -= damage;
-        agent.isStopped = true;
-        if (life >= 0)
+        if (life > 0)
         {
+            life -= damage;
+            agent.isStopped = true;
             animator.SetTrigger("tookShot");
             animator.SetBool("canWalk", false);
             animator.SetBool("stopAttack", true);

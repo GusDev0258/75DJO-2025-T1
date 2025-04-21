@@ -120,7 +120,7 @@ public class AtiradorElite : MonoBehaviour, ILevarDano
 
     private IEnumerator RealizarAtaque(Vector3 pontoImpacto)
     {
-        yield return new WaitForSeconds(2f); 
+        yield return new WaitForSeconds(1f); 
 
         animator.SetTrigger("atirar");
 
